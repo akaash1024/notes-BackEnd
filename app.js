@@ -8,28 +8,11 @@ const cors = require("cors");
 const PORT = process.env.PORT;
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-// Add logging middleware to see incoming requests
-app.use((req, res, next) => {
-  console.log('Incoming request:', req.method, req.path);
-  console.log('Origin:', req.headers.origin);
-  next();
-});
 
-app.use(cors({
-  origin: 'http://localhost:5173',  
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders:  ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}));
-
-app.options('*', cors()) 
-
-
-
-app.use("/users", userRoutes);
-app.use("/todos", todoRoutes);
+app.use("api/users", userRoutes);
+app.use("api/todos", todoRoutes);
 
 app.get("/", (req, res) => {
   res.json({ msg: "Hello Express" });
