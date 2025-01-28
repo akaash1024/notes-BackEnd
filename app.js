@@ -1,36 +1,30 @@
 require("dotenv").config();
+const path = require("path")
 const express = require("express");
-const app = express();
 const connection = require("./config/db");
 const userRoutes = require("./Routes/user.routes");
 const todoRoutes = require("./Routes/todo.routes");
+const homeRoutes = require("./Routes/home.routes");
 const cors = require("cors");
 
 const PORT = process.env.PORT;
 
-// let's tackle cors
-const corsOptions = {
-  // origin: "http://localhost:5173",
-  origin: (origin, callback) => {
-    // Check if the origin is allowed
-    const allowedOrigins = ["http://localhost:5173"];
-    const isAllowed = allowedOrigins.includes(origin);
-    callback(null, isAllowed ? origin : false);
-  },
-  methods: "GET, POST, PUT, DELETE, PATCH, HEAD",
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
+const app = express();
+app.use(cors());
 app.use(express.json());
 
-app.use("api/users", userRoutes);
-app.use("api/todos", todoRoutes);
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.json({ msg: "Hello Express" });
-});
+const staticPath = path.join(__dirname, "public");
+app.use(express.static(staticPath));
+
+
+
+app.use("/users", userRoutes);
+app.use("/todos", todoRoutes);
+app.set("view engine", "ejs");
+
+app.get("/", homeRoutes);
 
 app.listen(PORT, async () => {
   try {
